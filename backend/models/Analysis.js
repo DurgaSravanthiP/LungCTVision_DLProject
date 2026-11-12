@@ -7,7 +7,11 @@ const analysisSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    patientId: { type: String, default: "" },
+    patientId: {
+      type: String,
+      required: [true, "Patient ID is mandatory"],
+      trim: true,
+    },
     scanType: {
       type: String,
       enum: ["lung_ct"],
