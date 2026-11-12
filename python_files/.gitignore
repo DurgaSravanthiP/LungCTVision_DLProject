@@ -12,7 +12,6 @@ venv/
 
 # Dataset images
 datasets/
-processed_data/
 
 # Trained model artifacts
 *.keras
