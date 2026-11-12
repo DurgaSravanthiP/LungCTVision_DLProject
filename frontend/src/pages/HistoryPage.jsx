@@ -2,15 +2,13 @@ import { useEffect, useState } from "react";
 import { fetchPredictionHistory } from "../services/diagnosisService";
 
 function formatScanName(scanType) {
-  if (scanType === "brain_mri") return "Brain MRI";
   if (scanType === "lung_ct") return "Lung CT";
   return "Unknown scan";
 }
 
 function formatDiseaseFocus(row) {
   if (row.diseaseType) return row.diseaseType;
-  if (row.scanType === "brain_mri") return "Brain tumour classification";
-  if (row.scanType === "lung_ct") return "Lung cancer classification";
+  if (row.scanType === "lung_ct") return "Five-class lung cancer classification";
   return "Not recorded";
 }
 

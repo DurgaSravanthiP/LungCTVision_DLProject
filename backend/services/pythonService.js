@@ -7,13 +7,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PYTHON_DIR = path.resolve(__dirname, "../../python_files");
 
-export function runPythonPrediction(scanType, filePath) {
-  const normalizedType = scanType === "brain_mri" ? "brain_mri" : "lung_ct";
-  const scriptName =
-    normalizedType === "brain_mri"
-      ? "brain_mri_predict.py"
-      : "lung_ct_predict.py";
-  const scriptPath = path.join(PYTHON_DIR, scriptName);
+export function runPythonPrediction(filePath) {
+  const scriptPath = path.join(PYTHON_DIR, "lung_ct_predict.py");
 
   return new Promise((resolve, reject) => {
     if (!fs.existsSync(scriptPath)) {

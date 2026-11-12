@@ -37,7 +37,7 @@ export default function LoginPage() {
   return (
     <AuthLayout
       title="Welcome back"
-      subtitle="Sign in to your MediScan AI workspace."
+      subtitle="Sign in to your LungScope AI workspace."
     >
       <form className="space-y-4" onSubmit={handleSubmit}>
         <AuthFormField
@@ -81,7 +81,7 @@ export default function LoginPage() {
       </form>
 
       <p className="mt-6 text-center text-sm text-slate-600">
-        New to MediScan AI?{" "}
+        New to LungScope AI?{" "}
         <Link
           to="/signup"
           className="font-medium text-teal-700 hover:underline"

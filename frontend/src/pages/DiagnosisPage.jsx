@@ -1,32 +1,21 @@
 import { useState } from "react";
 import { analyzeScan } from "../services/diagnosisService";
 
-const scanOptions = [
-  {
-    scanType: "brain_mri",
-    label: "Brain MRI",
-    focus: "Brain tumour classification",
-    description: "MRI",
-  },
-  {
-    scanType: "lung_ct",
-    label: "Lung CT",
-    focus: "Lung cancer classification",
-    description: "CT",
-  },
+const scanType = "lung_ct";
+const diseaseClasses = [
+  "Adenocarcinoma",
+  "Benign cases",
+  "Large cell carcinoma",
+  "Normal cases",
+  "Squamous cell carcinoma",
 ];
 
 export default function DiagnosisPage() {
   const [patientId, setPatientId] = useState("");
-  const [scanType, setScanType] = useState(scanOptions[0].scanType);
   const [image, setImage] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState(null);
   const [error, setError] = useState("");
-
-  const selectedOption = scanOptions.find(
-    (option) => option.scanType === scanType,
-  );
 
   const handleAnalyze = async (event) => {
     event.preventDefault();
@@ -71,7 +60,7 @@ export default function DiagnosisPage() {
         <div>
           <p className="eyebrow">Imaging workspace</p>
           <h2>Analyze a scan</h2>
-          <p>Enter patient details and submit one image for AI-assisted review.</p>
+          <p>Submit one lung CT image for five-class AI-assisted review.</p>
         </div>
       </header>
 
@@ -107,39 +96,20 @@ export default function DiagnosisPage() {
           <div className="analysis-section-title">
             <span>2</span>
             <div>
-              <h3>Choose scan type</h3>
-              <p>Select the scan that matches the image you will upload.</p>
+              <h3>Classification classes</h3>
+              <p>The model checks the uploaded CT against these five classes.</p>
             </div>
           </div>
-          <div className="analysis-scan-options" role="radiogroup" aria-label="Scan type">
-            {scanOptions.map((option) => (
-              <label
-                key={option.scanType}
-                className={`analysis-scan-option ${
-                  scanType === option.scanType ? "selected" : ""
-                }`}
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {diseaseClasses.map((diseaseClass) => (
+              <li
+                key={diseaseClass}
+                className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700"
               >
-                <input
-                  type="radio"
-                  name="scanType"
-                  value={option.scanType}
-                  checked={scanType === option.scanType}
-                  onChange={(event) => {
-                    setScanType(event.target.value);
-                    setImage(null);
-                    setAnalysis(null);
-                    setError("");
-                  }}
-                />
-                <span className="analysis-scan-badge">{option.description}</span>
-                <span className="analysis-scan-copy">
-                  <strong>{option.label}</strong>
-                  <small>{option.focus}</small>
-                </span>
-                <span className="analysis-radio-indicator" aria-hidden="true" />
-              </label>
+                {diseaseClass}
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
 
         <section className="analysis-section">
@@ -148,8 +118,7 @@ export default function DiagnosisPage() {
             <div>
               <h3>Upload scan image</h3>
               <p>
-                Choose a {selectedOption?.label} image. JPG, PNG or WEBP, up to
-                5 MB.
+                Choose a lung CT image. JPG, PNG or WEBP, up to 5 MB.
               </p>
             </div>
           </div>
@@ -217,7 +186,7 @@ export default function DiagnosisPage() {
           <div className="analysis-result-grid">
             <div>
               <span>Scan type</span>
-              <strong>{selectedOption?.label}</strong>
+              <strong>              Lung CT</strong>
             </div>
             <div>
               <span>Model output</span>
@@ -231,8 +200,8 @@ export default function DiagnosisPage() {
             </div>
           </div>
           <p className="analysis-result-note">
-            {selectedOption?.focus}. Review this AI-generated result with
-            appropriate clinical information.
+            Five-class lung cancer classification. Review this AI-generated
+            result with appropriate clinical information.
           </p>
         </section>
       )}

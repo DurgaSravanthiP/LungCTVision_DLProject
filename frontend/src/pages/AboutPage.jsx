@@ -1,15 +1,9 @@
 const capabilities = [
   {
-    title: "Brain MRI",
-    category: "Brain tumor classification",
-    description:
-      "A trained image-classification model returns a tumor or normal class with a confidence score.",
-  },
-  {
     title: "Lung CT",
-    category: "Lung cancer classification",
+    category: "Five-class lung cancer classification",
     description:
-      "A separate image-classification model returns a cancerous or non-cancerous class with a confidence score.",
+      "A trained image-classification model returns adenocarcinoma, benign, large cell carcinoma, normal, or squamous cell carcinoma with a confidence score.",
   },
 ];
 
@@ -17,14 +11,14 @@ export default function AboutPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-8">
       <header className="max-w-3xl">
-        <p className="eyebrow">MediScan AI</p>
+        <p className="eyebrow">LungScope AI</p>
         <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
           Medical imaging review workspace
         </h2>
         <p className="mt-4 text-base leading-7 text-slate-600">
-          MediScan AI brings brain MRI and lung CT image classification into a
-          single patient-organized workflow. Clinicians can submit either scan
-          type, review model output, and return to saved results from history.
+          LungScope AI focuses on classifying lung CT images with a
+          patient-organized workflow. Clinicians can submit a scan, review
+          model output, and return to saved results from history.
         </p>
       </header>
 
@@ -37,10 +31,10 @@ export default function AboutPage() {
             Supported analysis
           </h3>
           <p className="mt-1 text-sm text-slate-600">
-            Each modality uses its corresponding trained classification model.
+            The model is trained on the five classes in the lung cancer dataset.
           </p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4">
           {capabilities.map((item) => (
             <article
               key={item.title}
@@ -63,9 +57,8 @@ export default function AboutPage() {
           Designed for consistent review
         </h3>
         <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-600">
-          Each result is stored with its patient ID, scan type, disease focus,
-          model classification, confidence score, and submission date. MRI and
-          CT scans can be submitted independently or together.
+          Each result is stored with its patient ID, lung CT disease focus,
+          model classification, confidence score, and submission date.
         </p>
       </section>
     </div>

@@ -2,7 +2,9 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api";
 
 function authHeaders() {
   try {
-    const stored = JSON.parse(localStorage.getItem("mediscan_auth") || "null");
+    const stored = JSON.parse(
+      localStorage.getItem("lungscope_ai_auth") || "null",
+    );
     return stored?.token ? { Authorization: `Bearer ${stored.token}` } : {};
   } catch {
     return {};

@@ -10,7 +10,7 @@ const analysisSchema = new mongoose.Schema(
     patientId: { type: String, default: "" },
     scanType: {
       type: String,
-      enum: ["brain_mri", "lung_ct"],
+      enum: ["lung_ct"],
       required: true,
     },
     diseaseType: { type: String, required: true },

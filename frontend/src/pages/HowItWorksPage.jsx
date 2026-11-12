@@ -7,7 +7,7 @@ const workflow = [
   {
     number: "02",
     title: "Add imaging",
-    detail: "Upload a brain MRI, a lung CT, or both. Each scan is handled by its corresponding model.",
+    detail: "Upload one lung CT image to analyze it with the five-class lung cancer model.",
   },
   {
     number: "03",
@@ -30,7 +30,7 @@ export default function HowItWorksPage() {
           A clear path from scan upload to saved result
         </h2>
         <p className="mt-3 leading-7 text-slate-600">
-          Patient-linked analysis keeps MRI and CT review organized in one
+          Patient-linked analysis keeps lung CT review organized in one
           workspace.
         </p>
       </header>
@@ -56,21 +56,20 @@ export default function HowItWorksPage() {
 
       <section className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-6">
         <h3 className="text-base font-semibold text-slate-900">
-          Supported imaging workflows
+          Supported lung CT classes
         </h3>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-xl bg-white p-4">
-            <p className="font-medium text-slate-900">Brain MRI</p>
-            <p className="mt-1 text-sm text-slate-600">
-              Brain tumor / normal classification
-            </p>
-          </div>
-          <div className="rounded-xl bg-white p-4">
-            <p className="font-medium text-slate-900">Lung CT</p>
-            <p className="mt-1 text-sm text-slate-600">
-              Cancerous / non-cancerous classification
-            </p>
-          </div>
+          {[
+            "Adenocarcinoma",
+            "Benign cases",
+            "Large cell carcinoma",
+            "Normal cases",
+            "Squamous cell carcinoma",
+          ].map((diseaseClass) => (
+            <div key={diseaseClass} className="rounded-xl bg-white p-4">
+              <p className="font-medium text-slate-900">{diseaseClass}</p>
+            </div>
+          ))}
         </div>
       </section>
     </div>

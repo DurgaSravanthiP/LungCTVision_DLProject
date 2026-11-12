@@ -12,6 +12,11 @@ venv/
 
 # Dataset images
 datasets/
+processed_data/
+
+# Trained model artifacts
+*.keras
+lung_ct_class_names.json
 
 # Environment variables and secrets
 .env

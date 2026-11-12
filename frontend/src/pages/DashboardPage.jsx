@@ -5,15 +5,13 @@ import { fetchPredictionHistory } from "../services/diagnosisService";
 import { formatName } from "../utils/formatName";
 
 function scanLabel(scanType) {
-  if (scanType === "brain_mri") return "Brain MRI";
   if (scanType === "lung_ct") return "Lung CT";
   return "Unknown scan";
 }
 
 function diseaseFocus(row) {
   if (row.diseaseType) return row.diseaseType;
-  if (row.scanType === "brain_mri") return "Brain tumour classification";
-  if (row.scanType === "lung_ct") return "Lung cancer classification";
+  if (row.scanType === "lung_ct") return "Five-class lung cancer classification";
   return "Not recorded";
 }
 
@@ -33,8 +31,9 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, []);
   const recentAnalyses = analyses.slice(0, 5);
-  const mriCount = analyses.filter((item) => item.scanType === "brain_mri").length;
-  const ctCount = analyses.filter((item) => item.scanType === "lung_ct").length;
+  const patientCount = new Set(
+    analyses.map((item) => item.patientId).filter(Boolean),
+  ).size;
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -45,7 +44,7 @@ export default function DashboardPage() {
           </span>
           <h2>Welcome, Dr. {firstName}</h2>
           <p>
-          Review imaging classifications and keep each result organized by
+          Review lung CT classifications and keep each result organized by
           patient.
           </p>
         </div>
@@ -61,14 +60,14 @@ export default function DashboardPage() {
           <small>Saved analyses</small>
         </div>
         <div className="surface stat-card">
-          <span>MRI cases</span>
-          <strong>{mriCount}</strong>
-          <small>Brain MRI</small>
+          <span>Unique patients</span>
+          <strong>{patientCount}</strong>
+          <small>Across saved cases</small>
         </div>
         <div className="surface stat-card">
-          <span>CT cases</span>
-          <strong>{ctCount}</strong>
-          <small>Lung CT</small>
+          <span>Lung CT cases</span>
+          <strong>{analyses.length}</strong>
+          <small>Saved classifications</small>
         </div>
       </section>
 

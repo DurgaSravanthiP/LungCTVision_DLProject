@@ -188,7 +188,7 @@ export default function ProfilePage() {
             {analyses.slice(0, 5).map((item) => (
               <li key={item.id} className="profile-activity">
                 <span>
-                  {item.scanType === "brain_mri" ? "Brain MRI" : "Lung CT"}
+                  Lung CT
                 </span>
                 <span>Patient {item.patientId || "ID not provided"}</span>
                 <time dateTime={item.createdAt}>

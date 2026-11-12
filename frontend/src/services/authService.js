@@ -1,5 +1,5 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api";
-const STORAGE_KEY = "mediscan_auth";
+const STORAGE_KEY = "lungscope_ai_auth";
 
 export function getStoredAuth() {
   try {

@@ -1,20 +1,18 @@
-# MediScan AI
+# LungScope AI
 
-MediScan AI is a web application for organizing and reviewing two kinds of medical images:
+LungScope AI is a lung CT image-classification application with patient-linked
+results, account access, and analysis history. It classifies an uploaded image
+into one of the five classes in the local lung cancer dataset:
 
-- **Brain MRI** — predicts `Tumor` or `Normal`.
-- **Lung CT** — predicts `Cancerous` or `Non-Cancerous`.
+- Adenocarcinoma
+- Benign cases
+- Large cell carcinoma
+- Normal cases
+- Squamous cell carcinoma
 
-The application is intended for educational and research use. Its model output is not a medical diagnosis and should not replace assessment by a qualified healthcare professional.
-
-## How it works
-
-1. A doctor creates an account and signs in.
-2. The doctor opens **Analyze Scan**, enters a patient ID, chooses Brain MRI or Lung CT, and uploads one image.
-3. The React frontend sends the image to the Express backend.
-4. The backend runs the matching Python prediction script and loads its saved Keras model.
-5. The prediction and confidence are saved in MongoDB and shown to the user.
-6. **History** displays saved analysis results and their date and time.
+This project is for educational and research use. Model output and confidence
+are not a medical diagnosis and must not replace review by a qualified
+healthcare professional.
 
 ## Project structure
 
@@ -27,44 +25,56 @@ frontend/
   src/                    React pages, components, and API services
   vite.config.js          Vite development server and API proxy
 python_files/
-  brain_mri_model.ipynb   Brain MRI model training and evaluation
-  lung_ct_model.ipynb     Lung CT model training and evaluation
-  dataset_inspection.ipynb Dataset inspection and train/validation/test split
-  brain_mri_predict.py    Brain MRI inference
-  lung_ct_predict.py      Lung CT inference
-  *_efficientnet_*.keras  Saved model files
-  datasets/               Original image datasets (local)
-  processed_data/         Train, validation, and test image splits (local)
+  datasets/
+    Lung Cancer Dataset/  Local images, grouped into five class folders
+  prepare_lung_ct_dataset.py
+  train_lung_ct_model.py
+  lung_ct_predict.py
+  lung_cancer_model.ipynb  Training and evaluation notebook
 ```
 
-The training notebooks use TensorFlow/Keras and EfficientNetB0 with 224 × 224 RGB images. The dataset inspection notebook creates class-based training, validation, and test folders using a 70% / 15% / 15% split. The prediction scripts must use the same image size, pixel scale, and class interpretation used by training.
+The training pipeline makes reproducible, class-stratified 70/15/15
+train/validation/test splits under `python_files/processed_data/lung_cancer_ct`.
+It trains an ImageNet-pretrained EfficientNetB0 with 224 × 224 RGB images,
+evaluates it on the held-out test split, and saves
+`lung_cancer_classifier.keras` and `lung_ct_class_names.json` beside the Python
+scripts.
 
 ## Requirements
 
 - Node.js and npm
-- Python with TensorFlow, NumPy, and Pillow installed
+- Python with TensorFlow, NumPy, and Pillow
 - MongoDB, running locally or available through a MongoDB connection URI
 
-The Python interpreter found by the backend's `python` command must have the required Python packages installed. For example:
+From `python_files/`, install the model dependencies and train the new
+five-class model:
 
 ```powershell
-python -m pip install tensorflow numpy pillow
+cd python_files
+python -m pip install -r requirements.txt
+python prepare_lung_ct_dataset.py
+python train_lung_ct_model.py
 ```
 
-Use a Python version for which TensorFlow is available on your system.
+Alternatively, open `python_files/lung_cancer_model.ipynb` and run its cells.
+The first training run needs an internet connection to download EfficientNet's
+pretrained ImageNet weights. Training creates a new model; it does not reuse
+the previous two-class lung model.
 
 ## Run locally on Windows
 
 ### 1. Configure MongoDB and the backend
 
-Start MongoDB. In a PowerShell terminal:
+Start MongoDB. In PowerShell:
 
 ```powershell
 cd backend
 Copy-Item .env.example .env
 ```
 
-Edit `backend/.env` if needed. Set `MONGODB_URI` to your MongoDB connection URI and replace `JWT_SECRET` with a private random secret. Keep `.env` private; it is excluded from Git.
+Set `MONGODB_URI` if needed and replace `JWT_SECRET` with a private random
+secret. The default database is `lungscope_ai`.
+Keep `.env` private; it is excluded from Git.
 
 Install backend dependencies and start the API:
 
@@ -73,11 +83,11 @@ npm install
 npm run dev
 ```
 
-The API listens on `http://localhost:5000` by default. Keep this terminal running.
+The API listens on `http://localhost:5100` by default.
 
 ### 2. Start the frontend
 
-Open a second PowerShell terminal:
+Open another PowerShell terminal:
 
 ```powershell
 cd frontend
@@ -85,26 +95,19 @@ npm install
 npm run dev
 ```
 
-Open the local URL printed by Vite, usually `http://localhost:5173`. The Vite development server forwards `/api` requests to the backend on port 5000.
+Vite runs at `http://localhost:5174` and forwards `/api` requests to the
+backend on port 5100.
 
 ### 3. Use the application
 
 1. Sign up, then sign in.
-2. Open **Analyze Scan**.
-3. Enter a patient ID, select the matching scan type, and upload a supported image (JPG, PNG, or WEBP; up to 5 MB).
-4. Run the analysis and review the prediction and confidence.
-5. Open **History** to review saved predictions and timestamps.
+2. Open **Analyze Scan** and enter a patient ID.
+3. Upload one lung CT image (JPG, PNG, or WEBP; up to 5 MB).
+4. Review the predicted class and confidence.
+5. Open **History** to review saved results and timestamps.
 
-## Run the model notebooks
-
-The notebooks and image datasets are under `python_files/`. Open them in Jupyter or VS Code with a Python environment containing TensorFlow, NumPy, Pillow, and Matplotlib.
-
-1. Confirm the original dataset folders exist under `python_files/datasets/`.
-2. Run `dataset_inspection.ipynb` to inspect the data and create the train, validation, and test splits in `python_files/processed_data/`.
-3. Run the relevant model notebook from top to bottom to train, evaluate, and save the model.
-4. The prediction scripts load the corresponding `*_efficientnet_final.keras` file. Keep the model and its prediction script together in `python_files/`.
-
-Training can take time and may require substantial memory. The committed/local `.keras` files allow inference without training again.
+The backend runs the Python model from `python_files/`. Train the model before
+running an analysis.
 
 ## Useful commands
 
@@ -122,9 +125,11 @@ npm run dev
 npm start
 ```
 
-## Data and privacy notes
+## Data and privacy
 
-- Image datasets and generated train/validation/test folders are local project data and may be large.
-- Uploaded analysis images are kept under `backend/uploads/`; this directory is excluded from Git.
-- Do not upload identifiable patient information or real clinical images unless you have the necessary authorization and safeguards.
-- Model confidence is not a measure of clinical certainty. Always review outputs with appropriate clinical context.
+- The original dataset and generated image splits are local and excluded from
+  Git.
+- Uploaded scan images are kept under `backend/uploads/`.
+- Do not upload identifiable patient information or clinical images unless
+  you have the necessary authorization and safeguards.
+- A model confidence score is not a measure of clinical certainty.

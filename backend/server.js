@@ -20,12 +20,12 @@ dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5100;
 const MONGO_URI =
   process.env.MONGODB_URI ||
   process.env.MONGO_URI ||
-  "mongodb://127.0.0.1:27017/mediscan";
-const JWT_SECRET = process.env.JWT_SECRET || "mediscan-dev-secret";
+  "mongodb://127.0.0.1:27017/lungscope_ai";
+const JWT_SECRET = process.env.JWT_SECRET || "lungscope-ai-dev-secret";
 
 const app = express();
 const uploadDir = path.join(__dirname, "uploads", "temp");
@@ -93,7 +93,7 @@ app.get("/api/health", (_req, res) => {
   res.json({
     success: true,
     status: "ok",
-    service: "MediScan API",
+    service: "LungScope AI API",
     mongodb:
       mongoose.connection.readyState === 1 ? "connected" : "disconnected",
   });
@@ -259,47 +259,32 @@ async function handleAnalyze(req, res) {
   let analysisSaved = false;
   const patientId = req.body?.patientId?.trim?.() || "";
 
-  if (files.brainMriImage?.[0]) {
-    uploads.push({
-      file: files.brainMriImage[0],
-      scanType: "brain_mri",
-      diseaseType: "Brain tumour classification",
-    });
-  }
   if (files.lungCtImage?.[0]) {
     uploads.push({
       file: files.lungCtImage[0],
       scanType: "lung_ct",
-      diseaseType: "Lung cancer classification",
+      diseaseType: "Five-class lung cancer classification",
     });
   }
   if (files.image?.[0]) {
-    const scanType = req.body?.scanType;
-    if (!["brain_mri", "lung_ct"].includes(scanType)) {
-      uploads.push({ file: files.image[0], scanType: "" });
-    } else {
-      uploads.push({
-        file: files.image[0],
-        scanType,
-        diseaseType:
-          scanType === "brain_mri"
-            ? "Brain tumour classification"
-            : "Lung cancer classification",
-      });
-    }
+    uploads.push({
+      file: files.image[0],
+      scanType: req.body?.scanType || "lung_ct",
+      diseaseType: "Five-class lung cancer classification",
+    });
   }
 
   try {
-    if (uploads.some(({ scanType }) => !scanType)) {
+    if (uploads.some(({ scanType }) => scanType !== "lung_ct")) {
       return res
         .status(400)
-        .json({ success: false, message: "Invalid scan type." });
+        .json({ success: false, message: "Only lung CT scans are supported." });
     }
 
-    if (uploads.length === 0) {
+    if (uploads.length !== 1) {
       return res
         .status(400)
-        .json({ success: false, message: "Please upload an MRI or CT image." });
+        .json({ success: false, message: "Please upload one lung CT image." });
     }
 
     if (!patientId) {
@@ -313,7 +298,7 @@ async function handleAnalyze(req, res) {
         file,
         scanType,
         diseaseType,
-        prediction: await runPythonPrediction(scanType, file.path),
+        prediction: await runPythonPrediction(file.path),
       })),
     );
     const failedPrediction = predictionResults.find(
@@ -371,7 +356,6 @@ async function handleAnalyze(req, res) {
 }
 
 const analysisUploads = upload.fields([
-  { name: "brainMriImage", maxCount: 1 },
   { name: "lungCtImage", maxCount: 1 },
   { name: "image", maxCount: 1 },
 ]);
