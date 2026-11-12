@@ -36,7 +36,7 @@ export default function DiagnosisPage() {
     const normalizedPatientId = patientId.trim();
 
     if (!normalizedPatientId) {
-      setError("Enter a patient ID to save this result.");
+      setError("Patient ID is mandatory. Please enter a Patient ID before running the analysis.");
       return;
     }
 
@@ -101,16 +101,24 @@ export default function DiagnosisPage() {
 
       {/* Main Form */}
       <form className="analysis-form bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-6" onSubmit={handleAnalyze}>
-        {/* Step 1: Patient Information */}
+        {/* Step 1: Patient Information (Mandatory) */}
         <section className="analysis-section space-y-3">
           <div className="analysis-section-title flex items-center gap-2">
             <span className="w-6 h-6 rounded-full bg-teal-600 text-white text-xs font-bold flex items-center justify-center">1</span>
             <div>
-              <h3 className="font-semibold text-slate-800">Patient Identifier</h3>
-              <p className="text-xs text-slate-500">Use clinic patient identifier code. Avoid entering personal names.</p>
+              <h3 className="font-semibold text-slate-800">
+                Patient Identifier <span className="text-red-500 font-bold">* (Mandatory)</span>
+              </h3>
+              <p className="text-xs text-slate-500">Patient ID is required to link and save this scan in medical history.</p>
             </div>
           </div>
-          <label className="analysis-field block" htmlFor="patient-id">
+          <label className="analysis-field block space-y-1.5" htmlFor="patient-id">
+            <div className="flex justify-between items-center max-w-md">
+              <span className="text-xs font-bold text-slate-700">Patient ID <b>*</b></span>
+              {!patientId.trim() && (
+                <span className="text-[11px] text-red-500 font-medium">Required field</span>
+              )}
+            </div>
             <input
               id="patient-id"
               name="patientId"
@@ -124,7 +132,9 @@ export default function DiagnosisPage() {
                 setError("");
               }}
               placeholder="e.g. PT-1042"
-              className="w-full max-w-md px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm"
+              className={`w-full max-w-md px-4 py-2.5 rounded-xl border ${
+                !patientId.trim() ? "border-amber-400 bg-amber-50/20" : "border-slate-300"
+              } focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm`}
             />
           </label>
         </section>
@@ -257,7 +267,8 @@ export default function DiagnosisPage() {
           <button
             type="submit"
             disabled={!image || !patientId.trim() || isAnalyzing}
-            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 disabled:bg-slate-300 text-white font-semibold text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+            title={!patientId.trim() ? "Patient ID is required" : !image ? "Please choose an image" : "Run analysis"}
+            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
           >
             {isAnalyzing ? "Analyzing scan…" : "Run analysis"}
             {!isAnalyzing && <span aria-hidden="true">→</span>}
@@ -450,7 +461,7 @@ export default function DiagnosisPage() {
               className="w-full h-auto max-h-[80vh] object-contain rounded-xl"
             />
             <div className="p-3 text-white text-xs flex justify-between items-center">
-              <span>Patient ID: <b>{patientId || "Unspecified"}</b></span>
+              <span>Patient ID: <b>{analysis?.patientId || patientId}</b></span>
               <span>Modality: <b>Thoracic CT (Axial)</b></span>
             </div>
           </div>
