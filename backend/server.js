@@ -298,7 +298,7 @@ async function handleAnalyze(req, res) {
         file,
         scanType,
         diseaseType,
-        prediction: await runPythonPrediction(file.path),
+        prediction: await runPythonPrediction(file.path, file.originalname),
       })),
     );
     const failedPrediction = predictionResults.find(

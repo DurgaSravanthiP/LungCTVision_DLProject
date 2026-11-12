@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PYTHON_DIR = path.resolve(__dirname, "../../python_files");
 
-export function runPythonPrediction(filePath) {
+export function runPythonPrediction(filePath, originalName = "") {
   const scriptPath = path.join(PYTHON_DIR, "lung_ct_predict.py");
 
   return new Promise((resolve, reject) => {
@@ -15,7 +15,12 @@ export function runPythonPrediction(filePath) {
       return reject(new Error(`Python model script not found: ${scriptPath}`));
     }
 
-    const child = spawn("python", [scriptPath, filePath], {
+    const args = [scriptPath, filePath];
+    if (originalName) {
+      args.push(originalName);
+    }
+
+    const child = spawn("python", args, {
       cwd: PYTHON_DIR,
       env: process.env,
     });
